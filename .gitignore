@@ -12,3 +12,7 @@
 # Built Visual Studio Code Extensions
 *.vsix
 
+#ignore NPM/Node file
+.node_modules/
+node_modules/
+frontend/node_modules/
