@@ -1,0 +1,6 @@
+#ignore NPM/Node file
+/node_modules/
+
+# ---> Next.js
+/.next/
+/out/
