@@ -4,11 +4,12 @@ import (
 	"errors"
 	"time"
 
+	"social-network/backend/pkg/models"
+	"social-network/backend/pkg/repositories"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
-	"social-network/backend/pkg/models"
-	"social-network/backend/pkg/repositories"
 )
 
 type AuthService struct {
@@ -76,7 +77,7 @@ func (s *AuthService) Login(email, password string) (string, error) {
 }
 
 func (s *AuthService) ValidateToken(tokenString string) (string, error) {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("unexpected signing method")
 		}
