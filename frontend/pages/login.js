@@ -1,29 +1,48 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 const Login = () => {
   const [error, setError] = useState('');
+  const router = useRouter();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const username = e.target.username.value.trim();
+    const email = e.target.username.value.trim();
     const password = e.target.password.value.trim();
 
-    // Simple validation example
-    if (!username || !password) {
-      setError('Please enter both username/email and password.');
+    if (!email || !password) {
+      setError('Please enter both email and password.');
       return;
     }
 
-    // Simulate login failure for demonstration
-    if (username !== 'user@example.com' || password !== 'password123') {
-      setError('Incorrect username/email or password.');
-      return;
-    }
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    setError('');
-    // Proceed with successful login logic here
-    alert('Login successful!');
+      if (!response.ok) {
+        const data = await response.json();
+        setError(data.error || 'Login failed');
+        return;
+      }
+
+      const data = await response.json();
+      const token = data.token;
+
+      // Store token securely - for now localStorage (consider httpOnly cookie in production)
+      localStorage.setItem('token', token);
+
+      setError('');
+      // Redirect to home or protected page
+      router.push('/');
+    } catch (err) {
+      setError('An error occurred. Please try again.');
+    }
   };
 
   const handleInputChange = () => {
@@ -40,12 +59,12 @@ const Login = () => {
       <div className="login-form-container">
         {error && <div className="error-message">{error}</div>}
         <form className="login-form" onSubmit={handleSubmit}>
-          <label htmlFor="username" className="input-label">Username/e_mail</label>
+          <label htmlFor="username" className="input-label">Email</label>
           <input
             type="text"
             id="username"
             name="username"
-            placeholder="Placeholder"
+            placeholder="Enter your email"
             className="login-input"
             onChange={handleInputChange}
           />
@@ -54,14 +73,14 @@ const Login = () => {
             type="password"
             id="password"
             name="password"
-            placeholder="...................."
+            placeholder="Enter your password"
             className="login-input"
             onChange={handleInputChange}
           />
           <button type="submit" className="login-button">Login</button>
         </form>
         <div className="register-link">
-          Not register yet : <Link href="/register">register now</Link>
+          Not registered yet? <Link href="/register">Register now</Link>
         </div>
       </div>
       <div className="social-login">
