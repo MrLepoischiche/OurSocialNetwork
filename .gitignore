@@ -10,7 +10,6 @@
 .history/
 
 # Built Visual Studio Code Extensions
-<<<<<<< HEAD
 *.vsix
 
 #ignore NPM/Node file
@@ -21,6 +20,3 @@ frontend/node_modules/
 # Next.js build output
 .next/
 frontend/.next/
-=======
-*.vsix
->>>>>>> 3247902714d84366f8c3b4da6dc04f0c204caef5
