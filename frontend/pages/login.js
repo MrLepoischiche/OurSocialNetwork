@@ -38,8 +38,8 @@ const Login = () => {
       localStorage.setItem('token', token);
 
       setError('');
-      // Redirect to home or protected page
-      router.push('/');
+      // Redirect to success page after login
+      router.push('/mainpage')
     } catch (err) {
       setError('An error occurred. Please try again.');
     }
