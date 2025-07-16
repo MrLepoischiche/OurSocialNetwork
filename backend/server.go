@@ -10,6 +10,8 @@ import (
 	"social-network/backend/pkg/handlers"
 	"social-network/backend/pkg/repositories"
 	"social-network/backend/pkg/services"
+
+	"github.com/gorilla/mux"
 )
 
 func main() {
@@ -29,21 +31,40 @@ func main() {
 	userRepo := repositories.NewUserRepository(db.DB)
 	authService := services.NewAuthService(userRepo, os.Getenv("JWT_SECRET"))
 	authHandlers := handlers.NewAuthHandlers(authService)
+	postRepo := sqlite.NewPostRepository(db.DB)
+	postService := services.NewPostService(postRepo)
+	postHandlers := handlers.NewPostHandlers(postService)
+	userService := services.NewUserService(userRepo)
+	userHandlers := handlers.NewUserHandlers(userService)
 
-	// Set up routes
-	router := http.NewServeMux()
+	// Set up router
+	router := mux.NewRouter()
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Social Network Backend")
 	})
 
 	// Auth routes
-	router.HandleFunc("/api/auth/register", authHandlers.RegisterHandler)
-	router.HandleFunc("/api/auth/login", authHandlers.LoginHandler)
+	router.HandleFunc("/api/auth/register", authHandlers.RegisterHandler).Methods("POST")
+	router.HandleFunc("/api/auth/login", authHandlers.LoginHandler).Methods("POST")
+	router.HandleFunc("/api/auth/me", authHandlers.AuthMiddleware(authHandlers.MeHandler)).Methods("GET")
+	router.HandleFunc("/api/auth/update", authHandlers.AuthMiddleware(authHandlers.UpdateProfileHandler)).Methods("PUT")
+
+	// Post routes
+	router.HandleFunc("/api/posts", authHandlers.AuthMiddleware(postHandlers.CreatePostHandler)).Methods("POST")
+	router.HandleFunc("/api/posts", authHandlers.AuthMiddleware(postHandlers.GetPostsHandler)).Methods("GET")
+	router.HandleFunc("/api/posts/comments", authHandlers.AuthMiddleware(postHandlers.CreateCommentHandler)).Methods("POST")
+
+	// User profile routes
+	router.HandleFunc("/api/users/{id}", authHandlers.AuthMiddleware(userHandlers.GetUserProfileHandler)).Methods("GET")
+	router.HandleFunc("/api/users/{id}/posts", authHandlers.AuthMiddleware(userHandlers.GetUserPostsHandler)).Methods("GET")
+	router.HandleFunc("/api/users/{id}/followers", authHandlers.AuthMiddleware(userHandlers.GetUserFollowersHandler)).Methods("GET")
+	router.HandleFunc("/api/users/{id}/following", authHandlers.AuthMiddleware(userHandlers.GetUserFollowingHandler)).Methods("GET")
+	router.HandleFunc("/api/users/{id}/privacy", authHandlers.AuthMiddleware(userHandlers.UpdateUserPrivacyHandler)).Methods("PUT")
 
 	// Protected test route
 	router.HandleFunc("/api/protected", authHandlers.AuthMiddleware(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "This is a protected endpoint")
-	}))
+	})).Methods("GET")
 
 	// CORS middleware
 	corsHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

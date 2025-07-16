@@ -1,4 +1,0 @@
-DROP TABLE IF EXISTS event_rsvps;
-DROP TABLE IF EXISTS group_events;
-DROP TABLE IF EXISTS group_members;
-DROP TABLE IF EXISTS groups;
