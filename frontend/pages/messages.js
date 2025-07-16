@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 
 const Messages = () => {
   return (
@@ -13,9 +14,11 @@ const Messages = () => {
           borderRadius: '8px 8px 0 0',
         }}
       >
-        <div style={{ backgroundColor: '#aaa', padding: '0.5rem 1rem', borderRadius: '8px', fontWeight: 'bold' }}>
-          LOGO
-        </div>
+        <Link href="/mainpage" passHref>
+          <div style={{ backgroundColor: '#aaa', padding: '0.5rem 1rem', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+            LOGO
+          </div>
+        </Link>
         <div style={{ flex: 1, margin: '0 1rem' }}>
           <input
             type="text"

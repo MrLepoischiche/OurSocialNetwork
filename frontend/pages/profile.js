@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Link from 'next/link';
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState('posts');
@@ -50,9 +51,11 @@ const Profile = () => {
           marginBottom: '1rem',
         }}
       >
-        <div style={{ backgroundColor: '#aaa', padding: '0.5rem 1rem', borderRadius: '8px', fontWeight: 'bold' }}>
-          Profile
-        </div>
+        <Link href="/mainpage" passHref>
+          <div style={{ backgroundColor: '#aaa', padding: '0.5rem 1rem', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+            Profile
+          </div>
+        </Link>
         <div style={{ flex: 1 }}></div>
         <div style={{ width: '40px', height: '40px', backgroundColor: '#ccc', borderRadius: '50%', cursor: 'pointer' }}>
           🔔
