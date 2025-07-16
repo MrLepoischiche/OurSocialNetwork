@@ -18,7 +18,11 @@ const MainPage = () => {
             <ul style={{ listStyle: 'none', padding: 0 }}>
               <li style={{ marginBottom: '0.5rem', fontWeight: 'bold' }}>Home</li>
               <li style={{ marginBottom: '0.5rem' }}>Notifications</li>
-              <li style={{ marginBottom: '0.5rem' }}>Messages</li>
+              <li style={{ marginBottom: '0.5rem' }}>
+                <Link href="/messages" passHref>
+                  <div style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}>Messages</div>
+                </Link>
+              </li>
               <li style={{ marginBottom: '0.5rem' }}>Groups</li>
             </ul>
           </nav>
