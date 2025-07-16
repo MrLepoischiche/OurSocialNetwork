@@ -59,7 +59,7 @@ const Login = () => {
       <div className="login-form-container">
         {error && <div className="error-message">{error}</div>}
         <form className="login-form" onSubmit={handleSubmit}>
-          <label htmlFor="username" className="input-label">Email</label>
+          <label htmlFor="username" className="input-label">Email / Username</label>
           <input
             type="text"
             id="username"
@@ -84,7 +84,7 @@ const Login = () => {
         </div>
       </div>
       <div className="social-login">
-        <div className="social-login-item">Sign in With GOOGLE</div>
+        <div className="social-login-item">Sign in With google</div>
         <div className="social-login-item">Sign in with Discord</div>
       </div>
     </div>
