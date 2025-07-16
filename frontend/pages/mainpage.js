@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 
 const MainPage = () => {
   return (
@@ -9,7 +10,9 @@ const MainPage = () => {
           <div style={{ marginBottom: '2rem', fontWeight: 'bold', fontSize: '1.5rem' }}>LOGO</div>
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
             <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#bbb', marginRight: '0.5rem' }}></div>
-            <div>Name</div>
+            <Link href="/profile" passHref>
+              <div style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}>Name</div>
+            </Link>
           </div>
           <nav>
             <ul style={{ listStyle: 'none', padding: 0 }}>
