@@ -6,15 +6,19 @@ import (
 )
 
 type UserRepository struct {
-	db *sql.DB
+	repo repository
 }
 
 func NewUserRepository(db *sql.DB) *UserRepository {
-	return &UserRepository{db: db}
+	userRepo := &UserRepository{
+		repo: repository{DB: db},
+	}
+	var _ repositoryMethods[models.User] = userRepo // Ensure UserRepository implements repositoryMethods
+	return userRepo
 }
 
 func (r *UserRepository) Create(user *models.User) error {
-	_, err := r.db.Exec(`
+	_, err := r.repo.DB.Exec(`
 		INSERT INTO users (
 			id, email, password, first_name, last_name, 
 			date_of_birth, avatar, nickname, about_me, is_public
@@ -35,7 +39,7 @@ func (r *UserRepository) Create(user *models.User) error {
 
 func (r *UserRepository) GetByEmail(email string) (*models.User, error) {
 	var user models.User
-	err := r.db.QueryRow(`
+	err := r.repo.DB.QueryRow(`
 		SELECT 
 			id, email, password, first_name, last_name,
 			date_of_birth, avatar, nickname, about_me, is_public,
@@ -70,7 +74,7 @@ func (r *UserRepository) GetByEmail(email string) (*models.User, error) {
 
 func (r *UserRepository) GetByID(id string) (*models.User, error) {
 	var user models.User
-	err := r.db.QueryRow(`
+	err := r.repo.DB.QueryRow(`
 		SELECT 
 			id, email, first_name, last_name,
 			date_of_birth, avatar, nickname, about_me, is_public,
@@ -102,34 +106,8 @@ func (r *UserRepository) GetByID(id string) (*models.User, error) {
 	return &user, nil
 }
 
-func (r *UserRepository) Update(user *models.User) error {
-	_, err := r.db.Exec(`
-		UPDATE users SET
-			email = ?,
-			first_name = ?,
-			last_name = ?,
-			date_of_birth = ?,
-			avatar = ?,
-			nickname = ?,
-			about_me = ?,
-			is_public = ?,
-			updated_at = CURRENT_TIMESTAMP
-		WHERE id = ?`,
-		user.Email,
-		user.FirstName,
-		user.LastName,
-		user.DateOfBirth,
-		user.Avatar,
-		user.Nickname,
-		user.AboutMe,
-		user.IsPublic,
-		user.ID,
-	)
-	return err
-}
-
 func (r *UserRepository) GetFollowers(userID string) ([]models.User, error) {
-	rows, err := r.db.Query(`
+	rows, err := r.repo.DB.Query(`
 		SELECT u.id, u.email, u.first_name, u.last_name, u.date_of_birth, u.avatar, u.nickname, u.about_me, u.is_public, u.created_at, u.updated_at
 		FROM followers f
 		JOIN users u ON f.follower_id = u.id
@@ -166,7 +144,7 @@ func (r *UserRepository) GetFollowers(userID string) ([]models.User, error) {
 }
 
 func (r *UserRepository) GetFollowing(userID string) ([]models.User, error) {
-	rows, err := r.db.Query(`
+	rows, err := r.repo.DB.Query(`
 		SELECT u.id, u.email, u.first_name, u.last_name, u.date_of_birth, u.avatar, u.nickname, u.about_me, u.is_public, u.created_at, u.updated_at
 		FROM followers f
 		JOIN users u ON f.following_id = u.id
@@ -200,4 +178,37 @@ func (r *UserRepository) GetFollowing(userID string) ([]models.User, error) {
 	}
 
 	return following, nil
+}
+
+func (r *UserRepository) Update(user *models.User) error {
+	_, err := r.repo.DB.Exec(`
+		UPDATE users SET
+			email = ?,
+			first_name = ?,
+			last_name = ?,
+			date_of_birth = ?,
+			avatar = ?,
+			nickname = ?,
+			about_me = ?,
+			is_public = ?,
+			updated_at = CURRENT_TIMESTAMP
+		WHERE id = ?`,
+		user.Email,
+		user.FirstName,
+		user.LastName,
+		user.DateOfBirth,
+		user.Avatar,
+		user.Nickname,
+		user.AboutMe,
+		user.IsPublic,
+		user.ID,
+	)
+	return err
+}
+
+func (r *UserRepository) Delete(id string) error {
+	_, err := r.repo.DB.Exec(`
+		DELETE FROM users WHERE id = ?`, id,
+	)
+	return err
 }

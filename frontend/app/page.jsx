@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
-import { useRouter } from 'next/router'
-import styles from '../styles/SocialNetwork.module.css'
 import { FaHome, FaUser, FaUsers, FaBell, FaComments, FaLayerGroup, FaSignOutAlt } from 'react-icons/fa'
+import { useRouter } from 'next/router'
+
+import styles from '../styles/SocialNetwork.module.css'
 
 export default function HomePage() {
   const router = useRouter()

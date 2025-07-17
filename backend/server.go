@@ -31,7 +31,7 @@ func main() {
 	userRepo := repositories.NewUserRepository(db.DB)
 	authService := services.NewAuthService(userRepo, os.Getenv("JWT_SECRET"))
 	authHandlers := handlers.NewAuthHandlers(authService)
-	postRepo := sqlite.NewPostRepository(db.DB)
+	postRepo := repositories.NewPostRepository(db.DB)
 	postService := services.NewPostService(postRepo)
 	postHandlers := handlers.NewPostHandlers(postService)
 	userService := services.NewUserService(userRepo)
