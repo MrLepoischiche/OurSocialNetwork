@@ -1,13 +1,30 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
   const router = useRouter()
+
+  useEffect(() => {
+    if (errorMessage) {
+      const timer = setTimeout(() => {
+        setErrorMessage('')
+      }, 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [errorMessage])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setErrorMessage('')
+
+    if (!email || !password) {
+      setErrorMessage('Please enter both E-mail/Username and password.')
+      return
+    }
+
     try {
       const response = await fetch('http://localhost:8080/api/auth/login', {
         method: 'POST',
@@ -18,14 +35,24 @@ export default function Login() {
       })
 
       if (!response.ok) {
-        throw new Error('Login failed')
+        const errorData = await response.json()
+        const message = errorData.message || 'Password is wrong or login failed'
+        setErrorMessage(message)
+        return
       }
 
       const data = await response.json()
       localStorage.setItem('token', data.token)
       router.push('/HomePage')
     } catch (error) {
-      alert(error.message)
+      setErrorMessage('Login failed. E-mail or password do not match.')
+    }
+  }
+
+  const handleInputChange = (setter) => (e) => {
+    setter(e.target.value)
+    if (errorMessage) {
+      setErrorMessage('')
     }
   }
 
@@ -38,24 +65,23 @@ export default function Login() {
         </div>
         <div className="form-section">
           <form onSubmit={handleSubmit} className="login-form">
+            {errorMessage && <p className="error-message">{errorMessage}</p>}
             <label htmlFor="email" className="input-label">Username/e_mail</label>
             <input
               id="email"
               type="email"
-              placeholder="Placeholder"
+              placeholder="E-mail/Username"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
+              onChange={handleInputChange(setEmail)}
               className="input-field"
             />
             <label htmlFor="password" className="input-label">Password</label>
             <input
               id="password"
               type="password"
-              placeholder="********"
+              placeholder="Password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
+              onChange={handleInputChange(setPassword)}
               className="input-field password-field"
             />
             <button type="submit" className="login-button">Login</button>
@@ -197,6 +223,13 @@ export default function Login() {
         }
         .discord-button {
           /* Additional styling for Discord button if needed */
+        }
+        .error-message {
+          color: red;
+          font-size: 12px;
+          margin-top: -10px;
+          margin-bottom: 10px;
+          text-align: center;
         }
       `}</style>
     </div>
